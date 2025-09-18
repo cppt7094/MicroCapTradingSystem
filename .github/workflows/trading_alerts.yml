@@ -1,18 +1,17 @@
+name: MicroCap Trading System
 
-  name: MicroCap Trading System
+on: workflow_dispatch
 
-  on: workflow_dispatch
-
-  jobs:
-    test:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-        - uses: actions/setup-python@v4
-          with:
-            python-version: '3.11'
-        - run: pip install requests pandas numpy urllib3
-        - run: python cloud_algorithm_runner.py
-          env:
-            TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-            TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install requests pandas numpy urllib3
+      - run: python cloud_algorithm_runner.py
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
