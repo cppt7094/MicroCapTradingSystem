@@ -1,18 +1,14 @@
-name: MicroCap Trading System
+ name: MicroCap Trading System
 
   on:
     schedule:
-      # 9:30 AM EST (14:30 UTC) - Market open brief
       - cron: '30 14 * * 1-5'
-      # 6:00 PM EST (23:00 UTC) - Full EOD analysis
       - cron: '0 23 * * 1-5'
-    # Allow manual triggers
     workflow_dispatch:
 
   jobs:
     trading_analysis:
       runs-on: ubuntu-latest
-
       steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,7 +23,7 @@ name: MicroCap Trading System
           python -m pip install --upgrade pip
           pip install requests pandas numpy urllib3
 
-      - name: Run Market Open Brief (9:30 AM)
+      - name: Run Market Open Brief
         if: github.event.schedule == '30 14 * * 1-5'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -35,22 +31,13 @@ name: MicroCap Trading System
         run: |
           python market_open_brief.py
 
-      - name: Run EOD Analysis (6:00 PM)
+      - name: Run EOD Analysis
         if: github.event.schedule == '0 23 * * 1-5' || github.event_name == 'workflow_dispatch'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           python cloud_algorithm_runner.py
-
-      - name: Update portfolio data
-        run: |
-          git config --local user.email "trading-bot@github.com"
-          git config --local user.name "Trading Bot"
-          git add portfolio_data/ || true
-          git add output/ || true
-          git commit -m "Update analysis data - $(date '+%Y-%m-%d %H:%M UTC')" || exit 0
-          git push
 
       - name: Send status update
         if: always()
